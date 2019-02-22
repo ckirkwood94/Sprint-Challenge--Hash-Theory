@@ -9,19 +9,44 @@ char **reconstruct_trip(Ticket **tickets, int length)
   HashTable *ht = create_hash_table(16);
   char **route = malloc(length * sizeof(char *));
 
-  // YOUR CODE HERE
+  // First insert tickets into hash
+  for (int i = 0; i < length; i++)
+  {
+    // If source is NONE this is start of route
+    if (strcmp(tickets[i]->source, "NONE") == 0)
+    {
+      route[0] = tickets[i]->destination;
+    }
+    hash_table_insert(ht, tickets[i]->source, tickets[i]->destination);
+  }
 
+  // Reconstruct Route
+  for (int i = 1; i < length; i++)
+  {
+    // Get previous destination (route - 1) as source then retrieve new Source destination from hash table
+    if (hash_table_retrieve(ht, route[i - 1]) != NULL)
+    {
+      // set next route destination
+      route[i] = hash_table_retrieve(ht, route[i - 1]);
+    }
+    else
+    {
+      // If no matching key set last destination as NONE
+      route[i] = "NONE";
+    }
+  }
+  // destroy hash and return result
+  destroy_hash_table(ht);
   return route;
 }
 
 void print_route(char **route, int length)
 {
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     printf("%s\n", route[i]);
   }
 }
-
-
 
 #ifndef TESTING
 int main(void)
